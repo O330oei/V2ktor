@@ -129,8 +129,9 @@ sealed class SocketOptions(
     /**
      * Represents TCP client socket options
      */
-    class TCPClientSocketOptions internal constructor(customOptions: MutableMap<Any, Any?>) :
-        PeerSocketOptions(customOptions) {
+    class TCPClientSocketOptions internal constructor(
+        customOptions: MutableMap<Any, Any?>
+    ) : PeerSocketOptions(customOptions) {
         /**
          * TCP_NODELAY socket option, useful to disable Nagle
          */

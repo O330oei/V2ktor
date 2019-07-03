@@ -4,11 +4,11 @@
 
 package io.ktor.network.sockets
 
+import io.ktor.network.util.*
 import io.ktor.util.*
 import kotlinx.coroutines.*
 import io.ktor.utils.io.*
-import java.io.*
-import java.net.*
+import kotlinx.io.core.*
 
 /**
  * Base type for all async sockets
@@ -41,26 +41,6 @@ suspend fun ASocket.awaitClosed(): Unit {
 
     @OptIn(InternalCoroutinesApi::class)
     if (socketContext.isCancelled) throw socketContext.getCancellationException()
-}
-
-/**
- * Represent a connected socket
- */
-interface AConnectedSocket : AWritable {
-    /**
-     * Remote socket address. Could throw an exception if the peer is not yet connected or already disconnected.
-     */
-    val remoteAddress: SocketAddress
-}
-
-/**
- * Represents a bound socket
- */
-interface ABoundSocket {
-    /**
-     * Local socket address. Could throw an exception if no address bound yet.
-     */
-    val localAddress: SocketAddress
 }
 
 /**
@@ -114,7 +94,28 @@ fun AReadable.openReadChannel(): ByteReadChannel = ByteChannel(false).also { att
  * Open a write channel, could be opened only once
  * @param autoFlush whether returned channel do flush for every write operation
  */
-fun AWritable.openWriteChannel(autoFlush: Boolean = false): ByteWriteChannel = ByteChannel(autoFlush).also { attachForWriting(it) }
+fun AWritable.openWriteChannel(autoFlush: Boolean = false): ByteWriteChannel =
+    ByteChannel(autoFlush).also { attachForWriting(it) }
+
+/**
+ * Represent a connected socket
+ */
+interface AConnectedSocket : AWritable {
+    /**
+     * Remote socket address. Could throw an exception if the peer is not yet connected or already disconnected.
+     */
+    val remoteAddress: NetworkAddress
+}
+
+/**
+ * Represents a bound socket
+ */
+interface ABoundSocket {
+    /**
+     * Local socket address. Could throw an exception if no address bound yet.
+     */
+    val localAddress: NetworkAddress
+}
 
 /**
  * Represents a connected socket

@@ -4,10 +4,10 @@
 
 package io.ktor.network.sockets
 
+import io.ktor.network.util.*
 import io.ktor.util.*
 import kotlinx.coroutines.channels.*
 import io.ktor.utils.io.core.*
-import java.net.*
 
 internal const val MAX_DATAGRAM_SIZE = 65535
 
@@ -16,9 +16,11 @@ internal const val MAX_DATAGRAM_SIZE = 65535
  * @property packet content
  * @property address to send to
  */
-class Datagram(val packet: ByteReadPacket, val address: SocketAddress) {
+class Datagram(val packet: ByteReadPacket, val address: NetworkAddress) {
     init {
-        require(packet.remaining <= MAX_DATAGRAM_SIZE) { "Datagram size limit exceeded: ${packet.remaining} of possible $MAX_DATAGRAM_SIZE" }
+        require(packet.remaining <= MAX_DATAGRAM_SIZE) {
+            "Datagram size limit exceeded: ${packet.remaining} of possible $MAX_DATAGRAM_SIZE"
+        }
     }
 }
 
