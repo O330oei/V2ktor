@@ -5,7 +5,6 @@
 package io.ktor.util.collections
 
 import io.ktor.util.*
-import io.ktor.utils.io.core.*
 
 @InternalAPI
 class ConcurrentMap<Key, Value>(
@@ -58,7 +57,8 @@ class ConcurrentMap<Key, Value>(
      */
     @Deprecated(
         "This is accidentally does insert instead of get. Use computeIfAbsent or getOrElse instead.",
-        level = DeprecationLevel.ERROR
+        level = DeprecationLevel.ERROR,
+        replaceWith = ReplaceWith("this.computeIfAbsent(key, block)")
     )
     fun getOrDefault(key: Key, block: () -> Value): Value = lock.withLock {
         return computeIfAbsent(key, block)

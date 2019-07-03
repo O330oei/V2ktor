@@ -10,7 +10,6 @@ import io.ktor.client.request.*
 import io.ktor.client.utils.*
 import io.ktor.http.*
 import io.ktor.http.cio.*
-import io.ktor.http.cio.websocket.*
 import io.ktor.http.content.*
 import io.ktor.util.date.*
 import io.ktor.utils.io.*
@@ -109,8 +108,9 @@ internal suspend fun readResponse(
     val version = HttpProtocolVersion.parse(rawResponse.version)
 
     if (status == HttpStatusCode.SwitchingProtocols) {
-        val session = RawWebSocket(input, output, masking = true, coroutineContext = callContext)
-        return HttpResponseData(status, requestTime, headers, version, session, callContext)
+        TODO()
+//        val session = RawWebSocket(input, output, masking = true, coroutineContext = callContext)
+//        return HttpResponseData(status, requestTime, headers, version, session, callContext)
     }
 
     val body = when {
@@ -136,8 +136,10 @@ internal fun HttpStatusCode.isInformational(): Boolean = (value / 100) == 1
 /**
  * Wrap channel using [withoutClosePropagation] if [propagateClose] is false otherwise return the same channel.
  */
-internal fun ByteWriteChannel.wrap(coroutineContext: CoroutineContext, propagateClose: Boolean): ByteWriteChannel =
-    if (propagateClose) this else withoutClosePropagation(coroutineContext)
+internal fun ByteWriteChannel.handleHalfClosed(
+    coroutineContext: CoroutineContext,
+    propagateClose: Boolean
+): ByteWriteChannel = if (propagateClose) this else withoutClosePropagation(coroutineContext)
 
 /**
  * Wrap channel so that [ByteWriteChannel.close] of the resulting channel doesn't lead to closing of the base channel.
@@ -156,5 +158,6 @@ internal fun ByteWriteChannel.withoutClosePropagation(
 
     return GlobalScope.reader(coroutineContext, autoFlush = true) {
         channel.copyTo(this@withoutClosePropagation, Long.MAX_VALUE)
+        this@withoutClosePropagation.flush()
     }.channel
 }

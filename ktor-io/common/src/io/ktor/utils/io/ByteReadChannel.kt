@@ -1,6 +1,6 @@
 package io.ktor.utils.io
 
-import io.ktor.utils.io.bits.Memory
+import io.ktor.utils.io.bits.*
 import io.ktor.utils.io.core.*
 
 /**
@@ -46,6 +46,7 @@ expect interface ByteReadChannel {
      * @return number of bytes were read or `-1` if the channel has been closed
      */
     suspend fun readAvailable(dst: ByteArray, offset: Int, length: Int): Int
+
     suspend fun readAvailable(dst: IoBuffer): Int
 
     /**
@@ -53,6 +54,7 @@ expect interface ByteReadChannel {
      * Suspends if not enough bytes available.
      */
     suspend fun readFully(dst: ByteArray, offset: Int, length: Int)
+
     suspend fun readFully(dst: IoBuffer, n: Int)
 
     /**

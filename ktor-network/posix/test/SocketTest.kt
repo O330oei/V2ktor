@@ -2,27 +2,25 @@ package io.ktor.network.tests
 
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
-import io.ktor.util.coroutines.*
+import io.ktor.utils.io.*
+import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.io.*
-import kotlinx.io.core.*
-import kotlin.coroutines.*
 import kotlin.test.*
 
 
 class SocketTest {
 
     @Test
-    fun testEcho() = runBlockingWithHelp {
-        WorkerSelectorManager().use { selector ->
+    fun testEcho() = runBlocking {
+        SelectorManager().use { selector ->
             val tcp = aSocket(selector).tcp()
-            val server = tcp.bind("127.0.0.1", 8080)
+            val server = tcp.bind("127.0.0.1", 8000)
 
             val serverConnectionPromise = async {
                 server.accept()
             }
 
-            val clientConnection = tcp.connect("127.0.0.1", 8080)
+            val clientConnection = tcp.connect("127.0.0.1", 8000)
             val serverConnection = serverConnectionPromise.await()
 
             val clientOutput = clientConnection.openWriteChannel()

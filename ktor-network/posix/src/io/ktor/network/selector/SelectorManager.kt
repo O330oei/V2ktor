@@ -4,8 +4,15 @@
 
 package io.ktor.network.selector
 
+import io.ktor.util.*
+import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
-import kotlinx.io.core.*
+import kotlin.coroutines.*
+
+@InternalAPI
+actual fun SelectorManager(
+    dispatcher: CoroutineContext
+): SelectorManager = WorkerSelectorManager()
 
 actual interface SelectorManager : CoroutineScope, Closeable {
     /**

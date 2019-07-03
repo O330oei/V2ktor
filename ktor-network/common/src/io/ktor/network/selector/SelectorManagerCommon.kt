@@ -1,12 +1,14 @@
 package io.ktor.network.selector
 
 import io.ktor.util.*
+import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
-import kotlinx.io.core.*
 import kotlin.coroutines.*
 
 @InternalAPI
-expect fun platformSelectorManager(dispatcher: CoroutineContext): SelectorManager
+expect fun SelectorManager(
+    dispatcher: CoroutineContext = EmptyCoroutineContext
+): SelectorManager
 
 @InternalAPI
 expect interface SelectorManager : CoroutineScope, Closeable {

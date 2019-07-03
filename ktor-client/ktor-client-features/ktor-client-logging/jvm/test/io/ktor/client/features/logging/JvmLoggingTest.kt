@@ -42,7 +42,7 @@ class JvmLoggingTest {
             client.submitFormWithBinaryData<Unit>(formData = formData {
                 append("name", "sunny day")
                 append("image", "image.jpg") {
-                    writeStringUtf8("image-content")
+                    writeText("image-content")
                 }
             })
         }
@@ -53,7 +53,7 @@ private class PacketLogger : Logger {
     private val packet = BytePacketBuilder()
 
     override fun log(message: String) {
-        packet.writeStringUtf8("$message\n")
+        packet.writeText("$message\n")
     }
 
     fun buildLog(): ByteReadPacket = packet.build()

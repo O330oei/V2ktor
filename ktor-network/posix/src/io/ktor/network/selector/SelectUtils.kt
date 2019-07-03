@@ -4,7 +4,6 @@
 package io.ktor.network.selector
 
 import io.ktor.network.interop.*
-import io.ktor.network.sockets.*
 import io.ktor.network.util.*
 import io.ktor.util.collections.*
 import kotlinx.cinterop.*
@@ -14,13 +13,13 @@ import kotlin.coroutines.*
 import kotlin.math.*
 import kotlin.native.concurrent.*
 
-internal class EventInfo(
+internal data class EventInfo(
     val descriptor: Int,
     val interest: SelectInterest,
     val continuation: Continuation<Unit>
 )
 
-internal inline fun selectHelper(eventQueue: LockFreeMPSCQueue<EventInfo>) = memScoped {
+internal fun selectHelper(eventQueue: LockFreeMPSCQueue<EventInfo>) = memScoped {
     val readSet = alloc<fd_set>()
     val writeSet = alloc<fd_set>()
     val errorSet = alloc<fd_set>()
@@ -51,7 +50,7 @@ internal inline fun selectHelper(eventQueue: LockFreeMPSCQueue<EventInfo>) = mem
     }
 }
 
-internal inline fun fillHandlers(
+internal fun fillHandlers(
     eventQueue: LockFreeMPSCQueue<EventInfo>,
     watchSet: MutableSet<EventInfo>,
     readSet: fd_set,
@@ -77,7 +76,7 @@ internal inline fun fillHandlers(
             SelectInterest.READ -> readSet
             SelectInterest.WRITE -> writeSet
             SelectInterest.ACCEPT -> readSet
-            else -> error("")
+            else -> error("Interest value invalid ${event.interest} set")
         }
 
         select_fd_add(event.descriptor, set.ptr)
@@ -88,7 +87,7 @@ internal inline fun fillHandlers(
     return maxDescriptor
 }
 
-internal inline fun processSelectedEvents(
+internal fun processSelectedEvents(
     watchSet: MutableSet<EventInfo>,
     completed: MutableSet<EventInfo>,
     readSet: fd_set,
@@ -105,7 +104,7 @@ internal inline fun processSelectedEvents(
 
         if (select_fd_isset(event.descriptor, errorSet.ptr) != 0) {
             completed.add(event)
-            event.continuation.resumeWithException(SockerError())
+            event.continuation.resumeWithException(SocketError())
             continue
         }
         if (select_fd_isset(event.descriptor, set.ptr) != 0) {
@@ -119,4 +118,4 @@ internal inline fun processSelectedEvents(
     completed.clear()
 }
 
-class SockerError : IllegalStateException()
+class SocketError : IllegalStateException()

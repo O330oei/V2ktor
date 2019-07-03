@@ -53,7 +53,7 @@ internal class IPv6Address(
     private val flowInfo: uint32_t,
     private val scopeId: uint32_t
 ) : SocketAddress(family, port) {
-    private val ip = rawAddress.__in6_u.__u6_addr8.readBytes(16)
+//    private val ip = rawAddress.__u6_addr.readBytes(16)
 
     override fun nativeAddress(block: (address: CPointer<sockaddr>, size: socklen_t) -> Unit) {
         cValue<sockaddr_in6> {

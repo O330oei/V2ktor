@@ -4,7 +4,6 @@
 
 package io.ktor.client.engine
 
-import io.ktor.client.utils.*
 import io.ktor.util.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
@@ -34,14 +33,17 @@ abstract class HttpClientEngineBase(private val engineName: String) : HttpClient
 /**
  * Exception that indicates that client engine is already closed.
  */
-class ClientEngineClosedException(override val cause: Throwable? = null) :
-    IllegalStateException("Client already closed")
+class ClientEngineClosedException(
+    override val cause: Throwable? = null
+) : IllegalStateException("Client already closed")
 
 /**
  * Close [CoroutineDispatcher] if it's [Closeable].
  */
-private fun CoroutineDispatcher.close() = try {
-    (this as? Closeable)?.close()
-} catch (ignore: Throwable) {
-    // Some closeable dispatchers like Dispatchers.IO can't be closed.
+private fun CoroutineDispatcher.close() {
+    try {
+        (this as? Closeable)?.close()
+    } catch (ignore: Throwable) {
+        // Some closeable dispatchers like Dispatchers.IO can't be closed.
+    }
 }

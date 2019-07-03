@@ -120,12 +120,16 @@ private fun <S : CoroutineScope> CoroutineScope.launchChannel(
         if (attachJob) {
             channel.attachJob(coroutineContext[Job]!!)
         }
-        @Suppress("UNCHECKED_CAST")
-        block(ChannelScope(this, channel) as S)
-    }
-
-    job.invokeOnCompletion { cause ->
-        channel.close(cause)
+        try {
+            @Suppress("UNCHECKED_CAST")
+            block(ChannelScope(this, channel) as S)
+        } catch (cause: Throwable) {
+            channel.close(cause)
+            throw cause
+        } finally {
+            channel.close()
+            channel.closedCause?.let { throw it }
+        }
     }
 
     return ChannelJob(job, channel)

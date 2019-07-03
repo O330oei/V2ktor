@@ -3,31 +3,35 @@
  */
 package io.ktor.network.selector
 
+import io.ktor.util.*
 import io.ktor.util.collections.*
-import io.ktor.util.coroutines.*
 import kotlinx.coroutines.*
 import kotlin.coroutines.*
 import kotlin.native.concurrent.*
 
+
 class WorkerSelectorManager : SelectorManager {
-    override val coroutineContext: CoroutineContext = Dispatchers.Unconfined
+    private val selectorContext = newSingleThreadContext("WorkerSelectorManager")
+    override val coroutineContext: CoroutineContext = selectorContext
     override fun notifyClosed(selectable: Selectable) {}
 
-    private val selectorWorker = Worker.start(errorReporting = true)
     private val events: LockFreeMPSCQueue<EventInfo> = LockFreeMPSCQueue()
 
     init {
         freeze()
-        selectorWorker.execute(TransferMode.SAFE, { events }) { events -> selectHelper(events) }
+
+        launch {
+            selectHelper(events)
+        }
     }
 
     override suspend fun select(
         selectable: Selectable,
         interest: SelectInterest
-    ): Unit {
+    ) {
         if (events.isClosed) return
 
-        return suspendNativeCoroutine { continuation ->
+        return suspendCancellableCoroutine { continuation ->
             require(selectable is SelectableNative)
 
             val selectorState = EventInfo(selectable.descriptor, interest, continuation).freeze()
@@ -39,6 +43,6 @@ class WorkerSelectorManager : SelectorManager {
 
     override fun close() {
         events.close()
-        selectorWorker.requestTermination(processScheduledJobs = true)
+        selectorContext.worker.requestTermination(processScheduledJobs = true)
     }
 }

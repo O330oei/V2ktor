@@ -6,8 +6,6 @@
 
 package io.ktor.util
 
-import io.ktor.utils.io.core.*
-
 @InternalAPI
 expect class Lock() {
     fun lock()

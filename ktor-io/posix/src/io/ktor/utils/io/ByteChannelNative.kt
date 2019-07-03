@@ -6,6 +6,7 @@ import io.ktor.utils.io.internal.*
 import io.ktor.utils.io.pool.*
 import kotlinx.cinterop.*
 import kotlinx.coroutines.*
+import kotlin.native.concurrent.*
 
 
 /**
@@ -60,6 +61,10 @@ internal class ByteChannelNative(
     pool: ObjectPool<ChunkBuffer> = ChunkBuffer.Pool
 ) : ByteChannelSequentialBase(initial, autoFlush, pool) {
     private var attachedJob: Job? = null
+
+    init {
+        ensureNeverFrozen()
+    }
 
     @OptIn(InternalCoroutinesApi::class)
     override fun attachJob(job: Job) {

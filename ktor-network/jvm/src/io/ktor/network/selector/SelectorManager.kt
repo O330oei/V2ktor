@@ -5,9 +5,13 @@
 package io.ktor.network.selector
 
 import io.ktor.util.*
+import io.ktor.utils.io.core.*
 import kotlinx.coroutines.*
-import kotlinx.io.core.*
 import java.nio.channels.spi.*
+import kotlin.coroutines.*
+
+@InternalAPI
+actual fun SelectorManager(dispatcher: CoroutineContext): SelectorManager = ActorSelectorManager(dispatcher)
 
 /**
  * Selector manager is a service that manages NIO selectors and selection threads

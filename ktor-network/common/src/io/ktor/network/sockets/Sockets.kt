@@ -8,7 +8,7 @@ import io.ktor.network.util.*
 import io.ktor.util.*
 import kotlinx.coroutines.*
 import io.ktor.utils.io.*
-import kotlinx.io.core.*
+import io.ktor.utils.io.core.*
 
 /**
  * Base type for all async sockets

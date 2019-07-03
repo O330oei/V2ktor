@@ -1,8 +1,8 @@
 package io.ktor.utils.io
 
+import io.ktor.utils.io.bits.*
 import io.ktor.utils.io.core.*
 import kotlinx.cinterop.*
-import io.ktor.utils.io.bits.Memory
 
 /**
  * Channel for asynchronous reading of sequences of bytes.
@@ -228,11 +228,14 @@ actual interface ByteReadChannel {
     ): Long
 
     actual companion object {
-        actual val Empty: ByteReadChannel = ByteChannelNative(
-            IoBuffer.Empty, false,
-            io.ktor.utils.io.core.internal.ChunkBuffer.EmptyPool
-        ).apply {
-            close(null)
-        }
+        actual val Empty: ByteReadChannel get() = EMPTY_BYTE_READ_CHANNEL
     }
+}
+
+@ThreadLocal
+private val EMPTY_BYTE_READ_CHANNEL: ByteReadChannel = ByteChannelNative(
+    IoBuffer.Empty, false,
+    io.ktor.utils.io.core.internal.ChunkBuffer.EmptyPool
+).apply {
+    close(null)
 }
