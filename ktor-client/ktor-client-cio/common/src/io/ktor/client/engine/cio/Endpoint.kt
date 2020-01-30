@@ -102,8 +102,8 @@ internal class Endpoint(
     ): Deferred<HttpResponseData> = async(callContext + CoroutineName("DedicatedRequest")) {
         try {
             val connection = connect(request)
-            val input = mapEngineExceptions(connection.openReadChannel())
-            val originOutput = mapEngineExceptions(connection.openWriteChannel())
+            val input = this@Endpoint.mapEngineExceptions(connection.openReadChannel())
+            val originOutput = this@Endpoint.mapEngineExceptions(connection.openWriteChannel())
             val output = originOutput.handleHalfClosed(
                 callContext, config.endpoint.allowHalfClose
             )
@@ -168,7 +168,7 @@ internal class Endpoint(
             repeat(retryAttempts) {
                 val address = NetworkAddress(host, port)
 
-                if (address.isUnresolved) {
+                if (!address.isResolved) {
                     throw UnresolvedAddressException()
                 }
 

@@ -68,3 +68,8 @@ internal class IPv6Address(
         }
     }
 }
+
+actual class UnresolvedAddressException : IllegalArgumentException()
+
+actual val NetworkAddress.isResolved: Boolean
+    get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.

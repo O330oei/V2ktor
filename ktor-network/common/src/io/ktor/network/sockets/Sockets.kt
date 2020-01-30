@@ -6,9 +6,10 @@ package io.ktor.network.sockets
 
 import io.ktor.network.util.*
 import io.ktor.util.*
-import kotlinx.coroutines.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
+import io.ktor.utils.io.errors.*
+import kotlinx.coroutines.*
 
 /**
  * Base type for all async sockets
@@ -126,3 +127,6 @@ interface Socket : ReadWriteSocket, ABoundSocket, AConnectedSocket
  * Represents a server bound socket ready for accepting connections
  */
 interface ServerSocket : ASocket, ABoundSocket, Acceptable<Socket>
+
+@Suppress("EXPECT_WITHOUT_ACTUAL")
+expect class SocketTimeoutException(message: String) : IOException
